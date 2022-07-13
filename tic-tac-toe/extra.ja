@@ -1,0 +1,88 @@
+const Board = require('./board')
+const Player = require('./player')
+
+class Game {
+    constructor(nameOfPlayer1, nameOfPlayer2) {
+        this.player1 = new Player(nameOfPlayer1, "X")
+        this.player2 = new Player(nameOfPlayer2, "O")
+        this.board = new Board();
+        this.turn = 0
+
+    }
+
+    play(cellNumberToBeMarked) 
+    {
+        this.board.displayBoard()
+        if (this.board.isInvalidCell(cellNumberToBeMarked)) 
+        {
+            console.log("Choose cell Between 0 to 8 ")
+            return false
+        }
+
+        if (this.board.cells[cellNumberToBeMarked].isMarked()) 
+        {
+            console.log("Cell you choose is already marked , Choose another")
+            return false
+        }
+        if (this.turn % 2 == 0) 
+        {
+
+            // this.board.cells[cellNumberToBeMarked].markCell(this.player1)
+            // this.turn++
+            // if (this.board.resultAnalyse(this.player1)) {
+            //     console.log["player 1 is winner"]
+            //     return [true, this.player1]
+
+            // }
+
+            let [isWinner, nameOfPlayer] = this.turnOfPlayer(cellNumberToBeMarked, this.player1);
+            if (isWinner) 
+            {
+                console.log(nameOfPlayer, " won the game, Please restart the game");
+                check = true;
+                return;
+            }
+        }
+        else if (this.turn % 2 == 1) 
+        {
+            //      if(this.turn %2 == 1){
+            //     this.board.cells[cellNumberToBeMarked].markCell(this.player2)
+            //     this.turn++
+            //     if (this.board.resultAnalyse(this.player2)) {
+            //         return true, this.player2
+            //     }
+            // }
+            let [isWinner, nameOfPlayer] = this.turnOfPlayer(cellNumberToBeMarked, this.player2);
+            if (isWinner) 
+            {
+                console.log(nameOfPlayer, " won the game, please restart the game");
+                check = true;
+                return;
+
+            }
+
+        }
+        if(this.turn ==9 && check != true)
+        {
+            console.log("Game is Draw")
+        }
+        // return false
+    }
+
+    turnOfPlayer(cellNumberToBeMarked, player) 
+    {
+        this.board.cells[cellNumberToBeMarked].markCell(player);
+        this.turn++
+        this.board.displayBoard();
+        if (this.board.resultAnalyse(player)) 
+        {
+            return [true, player]
+        }
+        return [false, "continue the game"]
+    }
+
+
+
+}
+
+module.exports = Game 
