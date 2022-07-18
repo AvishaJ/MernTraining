@@ -1,0 +1,29 @@
+const uuid = require('uuid');
+class Credentials {
+    static allCredentials = []
+    constructor(userName, password) {
+        this.userName = userName
+        this.password = password
+        this.CredentialId = uuid.v4()
+    }
+
+    static finduserName(userName) {
+        for (let index = 0; index < Credentials.allCredentials.length; index++) {
+            if (Credentials.allCredentials[index].usernameuserName == userName) {
+                return [true, index]
+            }
+        }
+        return [false, -1]
+    }
+
+    static createCredential(userName, password) {
+        let [isuserNameExist, indexOfuserName] = Credentials.finduserName(userName)
+        if (isuserNameExist) {
+            return [false, "userName Already Exist", null]
+        }
+        let newCredential = new Credentials(userName, password)
+        Credentials.allCredentials.push(newCredential)
+        return [true, "Credential Created", newCredential]
+    }
+}
+module.exports = Credentials;
