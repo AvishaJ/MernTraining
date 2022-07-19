@@ -82,7 +82,7 @@ class User {
         }
         let newContact = new Contact(firstName, lastName)
         this.contacts.push(newContact)
-        return [newContact, "Contact created Suceefully"]
+        return [newContact, "Contact created Sucessfully"]
     }
 
     indexOfContact(fullName) {

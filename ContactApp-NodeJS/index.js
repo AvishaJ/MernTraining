@@ -14,10 +14,10 @@ const [admin, message] = User.createAdmin()
 
 app.post("/api/v1/login", (req, resp) => {
     const { userName, password } = req.body
-    let [indexOfUser, isUsenameExist] = User.findUser(userName);
+    let [indexOfUser, isUsenameExist] = User.findUser(userName)
     if (!isUsenameExist || User.allUsers[indexOfUser].credential.password != password) {
         resp.status(504).send("Invalid Credentials")
-        return;
+        return
     }
     const newPayload = new JWTPayload(User.allUsers[indexOfUser])
     const newToken = newPayload.createToken()
@@ -81,23 +81,53 @@ app.post("/api/v1/createContactDetail/:userName/:firstName/:lastName", (req, res
     let [indexOfUser, isUserExist] = User.findUser(userName)
     if (!isUserExist) {
         resp.status(504).send("User not Found")
-        return;
+        return
     }
     let firstName = req.params.firstName
     let lastName = req.params.lastName
-    let fullName = this.firstName + this.lastName
+    let fullName = `${firstName} ${lastName}`
     console.log(fullName)
     let [indexOfContact, isContactExist] = User.allUsers[indexOfUser].indexOfContact(fullName)
     if (!isContactExist) {
-        resp.status(504).send("Contact doesn't Exist")
+        resp.status(504).send("Contact doesnt Exist")
         return
     }
-    const { type, value } = req.body;
-    let [isContactDetailsAdded, newContactDetail] = User.allUsers[indexOfUser].contacts[indexOfContact].createContactDetails(type, value);
-    resp.status(200).send(newContactDetail);
-    return message;
+    const { type, 
+            value 
+           } = req.body
+    let [isContactDetailsAdded, newContactDetail] = User.allUsers[indexOfUser].contacts[indexOfContact].createContactDetails(type, value)
+    resp.status(200).send(newContactDetail)
+    return message
 })
 
+app.post("/api/v1/logout",(req,resp)=>{ 
+    resp.cookie("myToken",'none',
+    { 
+        expires: new Date(Date.now()+ 0*1000)
+    }) 
+    resp.status(200).send("logout Successfull")
+})
+
+
+app.listen(9000, () => {
+    console.log("App Started")
+})
+
+app.post("/api/v1/adminDeleteUser", (req, resp) => {
+    let userName = req.body
+    let [indexOfUser, isUserExist] = User.findUser(userName)
+    if (!isUserExist) {
+        resp.status(504).send("User doesn't Exist")
+        return
+    }
+    let [isUserDeleted, message] = admin.adminDeleteUser(userName)
+    if (!isUserDeleted) {
+        resp.status(504).send(message)
+        return
+    }
+    resp.status(201).send(message)
+    return
+})
 app.post("/api/v1/deleteUserContact/:userName", (req, resp) => {
     let userName = req.params.userName
     let { firstName, lastName } = req.body
@@ -114,26 +144,4 @@ app.post("/api/v1/deleteUserContact/:userName", (req, resp) => {
     }
     resp.status(200).send(message)
     return
-})
-
-app.post("/api/v1/adminDeleteUser", (req, resp) => {
-    let userName = req.body
-    let [indexOfUser, isUserExist] = User.findUser(userName)
-    if (!isUserExist) {
-        resp.status(504).send("User doesn't Exist");
-        return;
-    }
-    let [isUserDeleted, message] = admin.adminDeleteUser(userName)
-    if (!isUserDeleted) {
-        resp.status(504).send(message)
-        return;
-    }
-    resp.status(201).send(message)
-    return;
-})
-
-
-
-app.listen(9000, () => {
-    console.log("App Started")
 })
