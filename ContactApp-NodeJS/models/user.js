@@ -16,6 +16,8 @@ class User {
         this.contacts = []
     }
 
+   
+
     static createAdmin() {
         const userName = "avisha"
         const password = "avisha123"
@@ -28,7 +30,7 @@ class User {
         return [admin, "Admin created Successfully"]
     }
 
-    createNewUser(firstname, lastName, userName, password, role) {
+    async createNewUser(firstname, lastName, userName, password, role) {
         if (this.isActive == false) {
             return [null, "user cannot be created"]
         }
@@ -40,6 +42,8 @@ class User {
             return [null, "Username already exists "]
         }
         const newCredential = new Credentials(userName, password)
+        newCredential.password= await newCredential.getHashOfPw()
+        console.log(newCredential)
         const newUser = new User(firstname, lastName, newCredential, role)
         User.allUsers.push(newUser)
         return [newUser, "User created"]
@@ -87,10 +91,12 @@ class User {
 
     indexOfContact(fullName) {
         if (this.contacts.length == 0) {
+            
             return [-1, false]
         }
         for (let indexofContact = 0; indexofContact < this.contacts.length; indexofContact++) {
             if (this.contacts[indexofContact].isContactExist(fullName))
+            console.log(this.contacts[indexofContact].isContactExist(fullName))
                 return [indexofContact, true]
         }
         return [-1, false]

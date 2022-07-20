@@ -3,8 +3,8 @@ class ContactDetail {
 
     constructor(type, value) {
         this.contactDetailId = uuid.v4()
-        this.type = type;
-        this.value = value;
+        this.type = type
+        this.value = value
     }
 }
 

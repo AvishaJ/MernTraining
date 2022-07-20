@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const cookieParser= require('cookie-parser')
 const uuid = require('uuid');
 const User = require('./models/user')
 const { allUsers } = require('./models/user');
@@ -9,6 +10,7 @@ const JWTPayload = require('./models/auth');
 const app = express();
 app.use(cors())
 app.use(bodyParser.json())
+app.use(cookieParser())
 
 const [admin, message] = User.createAdmin()
 
@@ -22,15 +24,20 @@ app.post("/api/v1/login", (req, resp) => {
     const newPayload = new JWTPayload(User.allUsers[indexOfUser])
     const newToken = newPayload.createToken()
     resp.cookie("myToken", newToken),
-    {
-        expires: new Date(Date.now() + 1 * 10000)
-    }
+    // {
+    //     expires: new Date(Date.now() + 1 * 10000)
+    // }
     resp.status(200).send("Logged in")
 })
 
-app.post("/api/v1/createNewUser", (req, resp) => {
+app.post("/api/v1/createNewUser", async (req, resp) => {
+    const isValidAdmin =  JWTPayload.isValidAdmin(req,resp)
+    if(!isValidAdmin){
+        return
+    }
     let { firstName, lastName, userName, password, role } = req.body
-    let [newUser, message] = admin.createNewUser(firstName, lastName, userName, password, role)
+
+    let [newUser, message] = await admin.createNewUser(firstName, lastName, userName, password, role)
     if (newUser == null) {
         resp.status(504).send(message)
         return
@@ -40,10 +47,18 @@ app.post("/api/v1/createNewUser", (req, resp) => {
 })
 
 app.get("/api/v1/getUser", (req, resp) => {
+    const isValidAdmin =  JWTPayload.isValidAdmin(req,resp)
+    if(!isValidAdmin){
+        return
+    }
     resp.status(201).send(User.allUsers)
 })
 
 app.put("/api/v1/updateUser", (req, resp) => {
+    const isValidAdmin =  JWTPayload.isValidAdmin(req,resp)
+    if(!isValidAdmin){
+        return
+    }
     let { userName, propertyToUpdate, value } = req.body
     let [indexOfUser, isUserExist] = User.findUser(userName)
     if (!isUserExist) {
@@ -60,6 +75,10 @@ app.put("/api/v1/updateUser", (req, resp) => {
 })
 
 app.post("/api/v1/createContact/:userName", (req, resp) => {
+    const isValidUser =  JWTPayload.isValidUser(req,resp)
+    if(!isValidUser){
+        return "Not a Valid User"
+    }
     const { firstName, lastName } = req.body
     const userName = req.params.userName
     let [indexOfUser, isUserExist] = User.findUser(userName)
@@ -77,6 +96,10 @@ app.post("/api/v1/createContact/:userName", (req, resp) => {
 })
 
 app.post("/api/v1/createContactDetail/:userName/:firstName/:lastName", (req, resp) => {
+    const isValidUser =  JWTPayload.isValidUser(req,resp)
+    if(!isValidUser){
+        return "Invalid User"
+    }
     let userName = req.params.userName
     let [indexOfUser, isUserExist] = User.findUser(userName)
     if (!isUserExist) {
@@ -88,7 +111,9 @@ app.post("/api/v1/createContactDetail/:userName/:firstName/:lastName", (req, res
     let fullName = `${firstName} ${lastName}`
     console.log(fullName)
     let [indexOfContact, isContactExist] = User.allUsers[indexOfUser].indexOfContact(fullName)
+    console.log(indexOfContact, isContactExist)
     if (!isContactExist) {
+
         resp.status(504).send("Contact doesnt Exist")
         return
     }
@@ -114,6 +139,10 @@ app.listen(9000, () => {
 })
 
 app.post("/api/v1/adminDeleteUser", (req, resp) => {
+    const isValidAdmin =  JWTPayload.isValidAdmin(req,resp)
+    if(!isValidAdmin){
+        return "Only admin can delete"
+    }
     let userName = req.body
     let [indexOfUser, isUserExist] = User.findUser(userName)
     if (!isUserExist) {
@@ -129,6 +158,10 @@ app.post("/api/v1/adminDeleteUser", (req, resp) => {
     return
 })
 app.post("/api/v1/deleteUserContact/:userName", (req, resp) => {
+    const isValidUser =  JWTPayload.isValidUser(req,resp)
+    if(!isValidUser){
+        return "Invalid User"
+    }
     let userName = req.params.userName
     let { firstName, lastName } = req.body
     let fullName = this.firstName + this.lastName

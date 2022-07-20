@@ -1,5 +1,5 @@
 const uuid = require('uuid');
-const ContactDetails = require("./contactDetails.js")
+const ContactDetail = require("./contactDetails.js")
 
 class Contact {
 

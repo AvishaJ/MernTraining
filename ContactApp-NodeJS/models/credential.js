@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+const bcrypt = require("bcrypt")
 class Credentials {
     static allCredentials = []
     constructor(userName, password) {
@@ -6,7 +7,9 @@ class Credentials {
         this.password = password
         this.CredentialId = uuid.v4()
     }
-
+    async getHashOfPw() {
+        return bcrypt.hash(this.password,10)
+    }
     static finduserName(userName) {
         for (let index = 0; index < Credentials.allCredentials.length; index++) {
             if (Credentials.allCredentials[index].usernameuserName == userName) {
