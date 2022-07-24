@@ -17,14 +17,15 @@ const [admin, message] = User.createAdmin()
 app.post("/api/v1/login", (req, resp) => {
     const { userName, password } = req.body
     let [indexOfUser, isUsenameExist] = User.findUser(userName)
-    if (!isUsenameExist || User.allUsers[indexOfUser].credential.password != password) {
+    let isPassword = await User.allUsers[indexOfUser].comparePassword(password)
+    if (!isUsenameExist || isPassword== false) {
         resp.status(504).send("Invalid Credentials")
         return
     }
     const newPayload = new JWTPayload(User.allUsers[indexOfUser])
     const newToken = newPayload.createToken()
-    resp.cookie("myToken", newToken),
-    // {
+    resp.cookie("myToken", newToken)
+    // ,{
     //     expires: new Date(Date.now() + 1 * 10000)
     // }
     resp.status(200).send("Logged in")

@@ -60,6 +60,12 @@ class User {
         return [-1, false]
     }
 
+    async comparePassword(password){
+        let isPassword = await bcrypt.compare(password, this.credential.password)
+        return isPassword;
+    }
+
+
     adminDeleteUser(userName) {
         if (this.isActive == false) {
             return [false, "User doesn't Exist"]
