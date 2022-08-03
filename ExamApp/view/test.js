@@ -1,4 +1,5 @@
 const uuid = require('uuid');
+const Question = require('./question')
 class Tests 
 {
     static allTest = [];
@@ -18,7 +19,22 @@ class Tests
         if(this.tech == question.tech)
         {
             this.question.push(question);
-            this.outOffScore+=question.outOffScore
+        }
+        return;
+    }
+    
+    addQuestion(question)
+    {
+        this.question.push(new Question(question.tech, question.details, question.options, question.correctAnswer, question.complexity));
+        return;
+    }
+
+    updateOutOffScore()
+    {
+        this.outOffScore =0;
+        for(let index=0; index<this.question.length; index++)
+        {
+            this.outOffScore+=this.question[index].outOffScore;
         }
         return;
     }
@@ -36,14 +52,9 @@ class Tests
         return [-1,false];
     }
 
-    isUserQuestionIdexist(questionId)
+    testAttempted()
     {
-        for(let index=0; index<this.question.length; index++)
-        {
-            if(this.question[index].Id == questionId)
-            return [true,index];
-        }
-        return[false,-1];
+        this.isAttempted = true;
     }
 
     static getTest(stack)
@@ -55,36 +66,42 @@ class Tests
         for(let index =0; index<Tests.allTest.length; index++)
         {
             if(Tests.allTest[index].tech == frontend || Tests.allTest[index].tech == backend || Tests.allTest[index].tech == dataBase)
-            firsttest.push(Tests.allTest[index]);
+            {
+                let newTest = new Tests(Tests.allTest[index].tech)
+                for(let j=0; j<Tests.allTest[index].question.length; j++)
+                {
+                    newTest.addQuestion(Tests.allTest[index].question[j])
+                }
+                newTest.updateOutOffScore();
+                firsttest.push(newTest);
+            }
+            
         }
 
         return firsttest;
     }
 
-    updateTestScore(boolean,marks)
+    updateTestScore()
     {
-        if(boolean==false)
+        for(let index=0; index<this.question.length; index++)
         {
-            this.score -= marks;
+            if(this.question[index].selectedAnswer == this.question[index].correctAnswer)
+            {
+                this.score += this.question[index].outOffScore;
+                return;
+            }
+            this.score -= this.question[index].negativeMark;
             return;
         }
-        this.score += marks;
-        return;
     }
 
     isTestAttempted()
     {
         if(this.isAttempted == true)
         {
-            return [true,"Test is Attempted"];
+            return [true,"Test is already Attempted"];
         }
-        for(let index=0; index<this.question.length; index++)
-        {
-            if(this.question[index].selectedAnswer == "")
-            return [false,"Not All question Attempted"];
-        }
-        this.isAttempted = true;
-        return [true,"Attempted test"];
+        return [false,"Test is not Attempted"]
     }
 
 }

@@ -70,7 +70,7 @@ class User
                 if(this.test[index].tech==tech)
                 return [true,index,"Tech Exist"];
             }
-            return [false,-1,"Tech has not Any Test"]
+            return [false,-1,"Tech has no Test"]
         }
         return [false,-1,"This tech is not in the userList"];
     }
@@ -104,6 +104,46 @@ class User
             return [false,"All Test not Attempted"];
         }
         return [true,"All Test Attempted"];
+    }
+
+    updateFirstname(newFirstname) {
+        this.firstName = newFirstname;
+    }
+    
+    updateLastName(newlastname) {
+        this.lastName = newlastname;
+    }
+
+    updateCountry(country){
+        this.country = country;
+    }
+
+    updateExper(experience){
+        this.experience = experience;
+    }
+
+    update(propertyToUpdate, value)
+    {
+        switch (propertyToUpdate) 
+        {
+            case "firstName": 
+                this.updateFirstname(value)
+                return true;
+
+            case "lastName": 
+                this.updateLastName(value)
+                return true;
+
+            case "country":
+                this.updateCountry(value)
+                return true;
+                            
+            case "experience":
+                this.updateExper(value)
+                return true;
+                
+            default: return false;
+        }
     }
 }
 

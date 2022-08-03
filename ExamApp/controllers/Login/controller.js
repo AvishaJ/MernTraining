@@ -7,7 +7,7 @@ async function login(req,resp)
     let [indexOfUser,isUserExist] = User.findUser(userName)
     if(isUserExist == false)
     {
-        resp.status(504).send("Username is invalid,or User doesnt exists")
+        resp.status(504).send("Username is invalid,or User doesn't exists")
         return
     }
     let isPasswordMatch = await User.allUsers[indexOfUser].comparePassword(password)
@@ -21,7 +21,7 @@ async function login(req,resp)
     const newToken = newPayload.createToken();
     resp.cookie("mytoken",newToken)
     
-    resp.status(200).send("Login Successful :)")
+    resp.status(200).send("Login Successfull :)")
 }
 
 module.exports = login;
